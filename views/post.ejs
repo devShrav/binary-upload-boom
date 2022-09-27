@@ -31,6 +31,25 @@
       <a class="btn btn-primary" href="/profile">Return to Profile</a>
       <a class="btn btn-primary" href="/feed">Return to Feed</a>
     </div>
+    <div class="comments-section">
+      <h2>Comments</h2>
+      <ul class="list-unstyled">
+        <%for(let i = 0; i < comments.length; i++) {%>
+          <li>
+            <div><span><%= commentedBy[i] %> says: </span></div>
+            <p><%= comments[i].comment %></p>
+          </li>
+        <%}%>
+      </ul>
+      <h3>Add Comment</h3>
+      <form action="/post/addComment/<%= post.id %>" method="POST">
+        <div class="mb-3">
+          <label for="comment" class="form-label">Comment</label>
+          <textarea class="form-control" id="comment" name="comment"></textarea>
+          <button type="submit" class="btn btn-primary mt-3">Submit</button>
+      </div>
+      </form>
+    </div>
   </div>
 </div>
 

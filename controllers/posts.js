@@ -1,5 +1,7 @@
 const cloudinary = require("../middleware/cloudinary");
 const Post = require("../models/Post");
+const Comment = require("../models/Comment");
+const User = require("../models/User")
 
 module.exports = {
   getProfile: async (req, res) => {
@@ -20,8 +22,14 @@ module.exports = {
   },
   getPost: async (req, res) => {
     try {
+      const commentedBy = []
       const post = await Post.findById(req.params.id);
-      res.render("post.ejs", { post: post, user: req.user });
+      const comments = await Comment.find({post: req.params.id}).sort({createdAt: "asc"}).lean();
+      for(const comment of comments) {
+        let useri = await User.find(comment.user).lean()
+        commentedBy.push(useri[0].userName)
+      }
+      res.render("post.ejs", { post: post, user: req.user, comments: comments, commentedBy: commentedBy});
     } catch (err) {
       console.log(err);
     }
@@ -69,6 +77,20 @@ module.exports = {
       await Post.remove({ _id: req.params.id });
       console.log("Deleted Post");
       res.redirect("/profile");
+    } catch (err) {
+      res.redirect("/profile");
+    }
+  },
+  addComment: async (req, res) => {
+    try {
+      // Add a comment
+      await Comment.create({
+        comment: req.body.comment,
+        post: req.params.id,
+        user: req.user.id
+      });      
+      console.log("Comment Added!");
+      res.redirect("back");
     } catch (err) {
       res.redirect("/profile");
     }
